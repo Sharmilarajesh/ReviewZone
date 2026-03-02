@@ -114,7 +114,7 @@ const AdminDashboard = () => {
   const handleDeleteProduct = async (productId) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this product? All reviews will also be deleted.",
+        "Are you sure you want to delete this product? All reviews will also be deleted."
       )
     )
       return;
@@ -128,10 +128,16 @@ const AdminDashboard = () => {
     }
   };
 
-  // Helper function to get image URL
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/50x50?text=No+Img";
-    return `http://localhost:5000${path}`;
+    
+    if (path.startsWith("http")) return path;
+    
+    const baseURL = process.env.NODE_ENV === "production"
+      ? "https://reviewzone-backend.onrender.com"
+      : "http://localhost:5000";
+    
+    return `${baseURL}${path}`;
   };
 
   if (loading) return <LoadingSpinner />;
@@ -150,7 +156,6 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* Messages */}
       {error && (
         <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
           {error}
@@ -160,7 +165,6 @@ const AdminDashboard = () => {
         <div className="text-green-600 p-3 rounded-lg mb-4">{success}</div>
       )}
 
-      {/* Add/Edit Product Form */}
       {showForm && (
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -250,7 +254,6 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Products List */}
       <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">All Products</h2>
 
@@ -278,10 +281,7 @@ const AdminDashboard = () => {
                     <td className="py-3 px-2">
                       <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
                         <img
-                          src={
-                            product.image ||
-                            "https://via.placeholder.com/50x50?text=No+Img"
-                          }
+                          src={getImageUrl(product.image)}
                           alt={product.name}
                           className="max-w-full max-h-full object-contain"
                           onError={(e) => {
@@ -290,6 +290,14 @@ const AdminDashboard = () => {
                               "https://via.placeholder.com/50x50?text=No+Img";
                           }}
                         />
+                      </div>
+                    </td>
+                    <td className="py-3 px-2 font-medium">{product.name}</td>
+                    <td className="py-3 px-2">₹{product.price}</td>
+                    <td className="py-3 px-2">
+                      <div className="flex items-center">
+                        <span className="text-yellow-400 mr-1">★</span>
+                        {product.avgRating?.toFixed(1) || 0}
                       </div>
                     </td>
                     <td className="py-3 px-2">{product.totalReviews || 0}</td>
@@ -317,7 +325,6 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
           <h3 className="text-gray-600 mb-2">Total Products</h3>
