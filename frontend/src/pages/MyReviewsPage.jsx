@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getMyReviews, deleteReview } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StarRating from '../components/StarRating';
+import getImageUrl from '../utils/imageHelper';
 
 const MyReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
@@ -81,7 +82,7 @@ const MyReviewsPage = () => {
               {review.image && (
                 <div className="mt-4">
                   <img 
-                    src={review.image} 
+                    src={getImageUrl(review.image)}
                     alt="Review"
                     className="max-h-32 rounded-lg"
                   />

@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
+import getImageUrl from '../utils/imageHelper';
 
 const ProductCard = ({ product }) => {
   return (
     <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 hover:shadow-lg transition-shadow">
       <div className="h-40 mb-4 flex items-center justify-center bg-gray-50 rounded">
-        <img 
-          src={product.image || 'https://via.placeholder.com/300x300?text=No+Image'}
-          alt={product.name}
-          className="max-h-full max-w-full object-contain"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
-          }}
-        />
+        {product.image ? (
+          <img 
+            src={getImageUrl(product.image)}
+            alt={product.name}
+            className="max-h-full max-w-full object-contain"
+          />
+        ) : (
+          <span className="text-gray-400">No Image</span>
+        )}
       </div>
       
       <h3 className="text-gray-800 text-xl font-bold mb-2">{product.name}</h3>

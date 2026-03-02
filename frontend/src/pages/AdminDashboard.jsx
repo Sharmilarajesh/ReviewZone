@@ -7,6 +7,7 @@ import {
   deleteProduct,
 } from "../services/api";
 import LoadingSpinner from "../components/LoadingSpinner";
+import getImageUrl from "../utils/imageHelper";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ const AdminDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // Form state
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -128,18 +128,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const getImageUrl = (path) => {
-    if (!path) return "https://via.placeholder.com/50x50?text=No+Img";
-    
-    if (path.startsWith("http")) return path;
-    
-    const baseURL = process.env.NODE_ENV === "production"
-      ? "https://reviewzone-backend.onrender.com"
-      : "http://localhost:5000";
-    
-    return `${baseURL}${path}`;
-  };
-
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -225,11 +213,6 @@ const AdminDashboard = () => {
                     src={getImageUrl(editingProduct.image)}
                     alt="Current"
                     className="h-10 w-10 object-cover rounded"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src =
-                        "https://via.placeholder.com/40x40?text=Error";
-                    }}
                   />
                 </div>
               )}
@@ -280,16 +263,15 @@ const AdminDashboard = () => {
                   >
                     <td className="py-3 px-2">
                       <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                        <img
-                          src={getImageUrl(product.image)}
-                          alt={product.name}
-                          className="max-w-full max-h-full object-contain"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
-                              "https://via.placeholder.com/50x50?text=No+Img";
-                          }}
-                        />
+                        {product.image ? (
+                          <img
+                            src={getImageUrl(product.image)}
+                            alt={product.name}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-xs text-gray-400">No img</span>
+                        )}
                       </div>
                     </td>
                     <td className="py-3 px-2 font-medium">{product.name}</td>
