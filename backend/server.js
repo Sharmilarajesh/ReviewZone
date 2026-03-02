@@ -3,6 +3,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const connectDB = require("./config/db");
+
+
 const Product = require("./models/Product");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
@@ -70,7 +72,7 @@ const seedInitialProducts = async () => {
           name: "Laptop",
           price: 45000,
           description: "15-inch screen, 8GB RAM, 512GB SSD, Windows 11",
-          image: "/images/seeds/laptop.jpg", 
+          image: "/images/seeds/laptop.jpg",
         },
         {
           name: "Smartphone",
@@ -82,19 +84,19 @@ const seedInitialProducts = async () => {
           name: "Mouse",
           price: 499,
           description: "USB receiver, silent clicks, black color",
-          image: "/images/seeds/mouse.jpg", 
+          image: "/images/seeds/mouse.jpg",
         },
         {
           name: "Keyboard",
           price: 799,
           description: "Wired USB keyboard, full-size, multimedia keys",
-          image: "/images/seeds/keyboard.jpg", 
+          image: "/images/seeds/keyboard.jpg",
         },
         {
           name: "Headphones",
           price: 1299,
           description: "Over-ear, wired, comfortable padding",
-          image: "/images/seeds/headphones.jpg", 
+          image: "/images/seeds/headphones.jpg",
         },
         {
           name: "Smart Watch",
@@ -106,25 +108,25 @@ const seedInitialProducts = async () => {
           name: "Tablet",
           price: 12999,
           description: "10-inch display, 64GB storage, WiFi",
-          image: "/images/seeds/tablet.jpg", 
+          image: "/images/seeds/tablet.jpg",
         },
         {
           name: "Power Bank",
           price: 999,
           description: "20000mAh, dual USB ports, fast charging",
-          image: "/images/seeds/powerbank.jpg", 
+          image: "/images/seeds/powerbank.jpg",
         },
         {
           name: "USB Flash Drive",
           price: 399,
           description: "64GB, USB 3.0, plug and play",
-          image: "/images/seeds/flashdrive.jpg", 
+          image: "/images/seeds/flashdrive.jpg",
         },
         {
           name: "Bluetooth Speaker",
           price: 1499,
           description: "Portable, 10-hour battery, waterproof",
-          image: "/images/seeds/speaker.jpg", 
+          image: "/images/seeds/speaker.jpg",
         },
       ];
       await Product.insertMany(seedProducts);
