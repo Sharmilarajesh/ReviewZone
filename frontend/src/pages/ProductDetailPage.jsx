@@ -23,7 +23,9 @@ const ProductDetailPage = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    fetchProductAndReviews();
+    if (id) {
+      fetchProductAndReviews();
+    }
   }, [id]);
 
   const fetchProductAndReviews = async () => {
@@ -109,21 +111,28 @@ const ProductDetailPage = () => {
   if (loading) return <LoadingSpinner />;
   if (!product) return <div className="text-center py-8">Product not found</div>;
 
+  // Image URL helper
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/300x300?text=No+Image';
+    return `http://localhost:5000${path}`;
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Product Details */}
       <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 mb-8">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/3">
             <div className="bg-gray-50 rounded-lg h-64 flex items-center justify-center">
-              {product.image ? (
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="max-h-full max-w-full object-contain"
-                />
-              ) : (
-                <span className="text-gray-400">No image</span>
-              )}
+              <img 
+                src={getImageUrl(product.image)}
+                alt={product.name}
+                className="max-h-full max-w-full object-contain"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                }}
+              />
             </div>
           </div>
 
@@ -142,6 +151,7 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
+      {/* Messages */}
       {error && (
         <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
           {error}
@@ -153,6 +163,7 @@ const ProductDetailPage = () => {
         </div>
       )}
 
+      {/* Review Button */}
       {user && !showReviewForm && (
         <div className="mb-8">
           {userReview ? (
@@ -179,6 +190,7 @@ const ProductDetailPage = () => {
         </div>
       )}
 
+      {/* Review Form */}
       {showReviewForm && user && (
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -237,12 +249,14 @@ const ProductDetailPage = () => {
         </div>
       )}
 
+      {/* Login prompt */}
       {!user && (
         <div className="bg-blue-50 text-blue-700 p-4 rounded-lg mb-8">
           Please <button onClick={() => navigate('/login')} className="text-[#8B5CF6] underline">login</button> to write a review.
         </div>
       )}
 
+      {/* All Reviews */}
       <div>
         <h2 className="text-xl font-bold text-gray-800 mb-4">
           {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
@@ -290,9 +304,13 @@ const ProductDetailPage = () => {
                 
                 {review.image && (
                   <img 
-                    src={review.image} 
+                    src={getImageUrl(review.image)}
                     alt="Review"
                     className="mt-4 max-h-40 rounded-lg"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                    }}
                   />
                 )}
               </div>

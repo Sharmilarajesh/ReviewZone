@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   
+  // Form state
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -93,13 +94,11 @@ const AdminDashboard = () => {
         setSuccess('Product added successfully!');
       }
       
-      // Reset form
       setEditingProduct(null);
       setFormData({ name: '', price: '', description: '' });
       setImage(null);
       setShowForm(false);
       
-      // Refresh products
       fetchProducts();
       navigate('/admin');
     } catch (error) {
@@ -119,6 +118,12 @@ const AdminDashboard = () => {
     }
   };
 
+  // Helper function to get image URL
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/50x50?text=No+Img';
+    return `http://localhost:5000${path}`;
+  };
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -135,6 +140,7 @@ const AdminDashboard = () => {
         )}
       </div>
 
+      {/* Messages */}
       {error && (
         <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
           {error}
@@ -146,6 +152,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Add/Edit Product Form */}
       {showForm && (
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -200,9 +207,18 @@ const AdminDashboard = () => {
                 className="w-full px-4 py-2 border border-[#e0e0e0] rounded-lg"
               />
               {editingProduct?.image && !image && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Current image: {editingProduct.image.split('/').pop()}
-                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <p className="text-sm text-gray-500">Current image:</p>
+                  <img 
+                    src={getImageUrl(editingProduct.image)} 
+                    alt="Current"
+                    className="h-10 w-10 object-cover rounded"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/40x40?text=Error';
+                    }}
+                  />
+                </div>
               )}
             </div>
 
@@ -225,6 +241,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Products List */}
       <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">All Products</h2>
         
@@ -248,15 +265,15 @@ const AdminDashboard = () => {
                   <tr key={product._id} className="border-b border-[#e0e0e0] hover:bg-gray-50">
                     <td className="py-3 px-2">
                       <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                        {product.image ? (
-                          <img 
-                            src={product.image} 
-                            alt={product.name}
-                            className="max-w-full max-h-full object-contain"
-                          />
-                        ) : (
-                          <span className="text-xs text-gray-400">No img</span>
-                        )}
+                        <img 
+                          src={getImageUrl(product.image)}
+                          alt={product.name}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/50x50?text=No+Img';
+                          }}
+                        />
                       </div>
                     </td>
                     <td className="py-3 px-2 font-medium">{product.name}</td>
@@ -264,10 +281,10 @@ const AdminDashboard = () => {
                     <td className="py-3 px-2">
                       <div className="flex items-center">
                         <span className="text-yellow-400 mr-1">★</span>
-                        {product.avgRating.toFixed(1)}
+                        {product.avgRating?.toFixed(1) || 0}
                       </div>
                     </td>
-                    <td className="py-3 px-2">{product.totalReviews}</td>
+                    <td className="py-3 px-2">{product.totalReviews || 0}</td>
                     <td className="py-3 px-2">
                       <div className="flex gap-2">
                         <button
@@ -292,6 +309,7 @@ const AdminDashboard = () => {
         )}
       </div>
 
+      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
           <h3 className="text-gray-600 mb-2">Total Products</h3>
@@ -300,13 +318,16 @@ const AdminDashboard = () => {
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
           <h3 className="text-gray-600 mb-2">Total Reviews</h3>
           <p className="text-3xl font-bold text-[#8B5CF6]">
-            {products.reduce((sum, p) => sum + p.totalReviews, 0)}
+            {products.reduce((sum, p) => sum + (p.totalReviews || 0), 0)}
           </p>
         </div>
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
           <h3 className="text-gray-600 mb-2">Average Rating</h3>
           <p className="text-3xl font-bold text-[#8B5CF6]">
-            {(products.reduce((sum, p) => sum + p.avgRating, 0) / products.length || 0).toFixed(1)}
+            {products.length > 0 
+              ? (products.reduce((sum, p) => sum + (p.avgRating || 0), 0) / products.length).toFixed(1)
+              : 0
+            }
           </p>
         </div>
       </div>

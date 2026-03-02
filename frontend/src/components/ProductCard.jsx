@@ -1,18 +1,22 @@
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
+  const imageUrl = product.image 
+    ? `http://localhost:5000${product.image}` 
+    : 'https://via.placeholder.com/300x300?text=No+Image';
+
   return (
     <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 hover:shadow-lg transition-shadow">
       <div className="h-40 mb-4 flex items-center justify-center bg-gray-50 rounded">
-        {product.image ? (
-          <img 
-            src={product.image} 
-            alt={product.name}
-            className="max-h-full max-w-full object-contain"
-          />
-        ) : (
-          <span className="text-gray-400">No image</span>
-        )}
+        <img 
+          src={imageUrl}
+          alt={product.name}
+          className="max-h-full max-w-full object-contain"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+          }}
+        />
       </div>
       
       <h3 className="text-gray-800 text-xl font-bold mb-2">{product.name}</h3>
@@ -20,8 +24,8 @@ const ProductCard = ({ product }) => {
       
       <div className="flex items-center mb-4">
         <span className="text-yellow-400 text-xl mr-2">★</span>
-        <span className="text-gray-800">{product.avgRating.toFixed(1)}</span>
-        <span className="text-gray-500 text-sm ml-2">({product.totalReviews} reviews)</span>
+        <span className="text-gray-800">{product.avgRating?.toFixed(1) || 0}</span>
+        <span className="text-gray-500 text-sm ml-2">({product.totalReviews || 0} reviews)</span>
       </div>
       
       <Link 
