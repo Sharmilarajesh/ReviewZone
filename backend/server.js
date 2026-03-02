@@ -14,7 +14,6 @@ connectDB();
 
 const app = express();
 
-// during development allow any localhost port so the frontend can run on 5173, 5174, etc.
 const allowedOrigins = [
   "https://reviewzone-frontend.onrender.com",
   "https://reviewzone-backend.onrender.com",
@@ -23,10 +22,8 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // no origin (e.g. curl or mobile apps) should be allowed
       if (!origin) return callback(null, true);
 
-      // development convenience: allow localhost with any port
       if (
         process.env.NODE_ENV !== "production" &&
         /^https?:\/\/localhost(:\d+)?$/.test(origin)
@@ -55,10 +52,12 @@ app.use("/api/reviews", reviewRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.get("*", (req, res) => {
-    if (!req.path.startsWith("/api")) {
-      res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.startsWith("/api")) {
+      return res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
     }
+    next();
   });
 }
 
@@ -71,61 +70,61 @@ const seedInitialProducts = async () => {
           name: "Laptop",
           price: 45000,
           description: "15-inch screen, 8GB RAM, 512GB SSD, Windows 11",
-          image: "/images/seeds/laptop.jpg", // CHANGED PATH
+          image: "/images/seeds/laptop.jpg", 
         },
         {
           name: "Smartphone",
           price: 15000,
           description: "6.5-inch display, 128GB storage, 48MP camera",
-          image: "/images/seeds/smartphone.jpg", // CHANGED PATH
+          image: "/images/seeds/smartphone.jpg",
         },
         {
           name: "Mouse",
           price: 499,
           description: "USB receiver, silent clicks, black color",
-          image: "/images/seeds/mouse.jpg", // CHANGED PATH
+          image: "/images/seeds/mouse.jpg", 
         },
         {
           name: "Keyboard",
           price: 799,
           description: "Wired USB keyboard, full-size, multimedia keys",
-          image: "/images/seeds/keyboard.jpg", // CHANGED PATH
+          image: "/images/seeds/keyboard.jpg", 
         },
         {
           name: "Headphones",
           price: 1299,
           description: "Over-ear, wired, comfortable padding",
-          image: "/images/seeds/headphones.jpg", // CHANGED PATH
+          image: "/images/seeds/headphones.jpg", 
         },
         {
           name: "Smart Watch",
           price: 2499,
           description: "Fitness tracker, heart rate monitor",
-          image: "/images/seeds/smartwatch.jpg", // CHANGED PATH
+          image: "/images/seeds/smartwatch.jpg",
         },
         {
           name: "Tablet",
           price: 12999,
           description: "10-inch display, 64GB storage, WiFi",
-          image: "/images/seeds/tablet.jpg", // CHANGED PATH
+          image: "/images/seeds/tablet.jpg", 
         },
         {
           name: "Power Bank",
           price: 999,
           description: "20000mAh, dual USB ports, fast charging",
-          image: "/images/seeds/powerbank.jpg", // CHANGED PATH
+          image: "/images/seeds/powerbank.jpg", 
         },
         {
           name: "USB Flash Drive",
           price: 399,
           description: "64GB, USB 3.0, plug and play",
-          image: "/images/seeds/flashdrive.jpg", // CHANGED PATH
+          image: "/images/seeds/flashdrive.jpg", 
         },
         {
           name: "Bluetooth Speaker",
           price: 1499,
           description: "Portable, 10-hour battery, waterproof",
-          image: "/images/seeds/speaker.jpg", // CHANGED PATH
+          image: "/images/seeds/speaker.jpg", 
         },
       ];
       await Product.insertMany(seedProducts);
