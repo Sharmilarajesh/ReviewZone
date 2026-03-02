@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await getProfile();
       setUser(data);
     } catch (error) {
+      console.error('Load user error:', error);
       localStorage.removeItem('token');
     } finally {
       setLoading(false);
@@ -30,15 +31,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (formData) => {
-    const { data } = await apiLogin(formData);
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
-    return data;
+    try {
+      console.log('Login attempt with:', formData); // Debug
+      const { data } = await apiLogin(formData);
+      console.log('Login response:', data); // Debug
+      
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+      return data;
+    } catch (error) {
+      console.log('Login error details:', error.response?.data); // Debug
+      throw error;
+    }
   };
 
   const register = async (formData) => {
-    const { data } = await apiRegister(formData);
-    return data;
+    try {
+      console.log('Register attempt with:', formData); // Debug
+      const { data } = await apiRegister(formData);
+      console.log('Register response:', data); // Debug
+      return data;
+    } catch (error) {
+      console.log('Register error:', error.response?.data); // Debug
+      throw error;
+    }
   };
 
   const logout = () => {

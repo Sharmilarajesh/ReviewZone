@@ -6,15 +6,28 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const { uploadProduct } = require('../middleware/upload');
 
+
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
-    res.json(products);
+    
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://reviewzone-backend.onrender.com'
+      : 'http://localhost:5000';
+    
+    const productsWithUrls = products.map(product => {
+      const productObj = product.toObject();
+      if (productObj.image && !productObj.image.startsWith('http')) {
+        productObj.image = `${baseUrl}${productObj.image}`;
+      }
+      return productObj;
+    });
+    
+    res.json(productsWithUrls);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 router.get('/:id', async (req, res) => {
   try {
@@ -24,12 +37,20 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
     
-    res.json(product);
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://reviewzone-backend.onrender.com'
+      : 'http://localhost:5000';
+    
+    const productObj = product.toObject();
+    if (productObj.image && !productObj.image.startsWith('http')) {
+      productObj.image = `${baseUrl}${productObj.image}`;
+    }
+    
+    res.json(productObj);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 router.post('/', [auth, admin, uploadProduct.single('image')], async (req, res) => {
   try {
@@ -47,12 +68,21 @@ router.post('/', [auth, admin, uploadProduct.single('image')], async (req, res) 
     });
 
     const product = await newProduct.save();
-    res.status(201).json(product);
+    
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://reviewzone-backend.onrender.com'
+      : 'http://localhost:5000';
+    
+    const productObj = product.toObject();
+    if (productObj.image && !productObj.image.startsWith('http')) {
+      productObj.image = `${baseUrl}${productObj.image}`;
+    }
+    
+    res.status(201).json(productObj);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 router.put('/:id', [auth, admin], async (req, res) => {
   try {
@@ -70,7 +100,17 @@ router.put('/:id', [auth, admin], async (req, res) => {
     product.image = image || product.image;
 
     await product.save();
-    res.json(product);
+    
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://reviewzone-backend.onrender.com'
+      : 'http://localhost:5000';
+    
+    const productObj = product.toObject();
+    if (productObj.image && !productObj.image.startsWith('http')) {
+      productObj.image = `${baseUrl}${productObj.image}`;
+    }
+    
+    res.json(productObj);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -86,7 +126,6 @@ router.delete('/:id', [auth, admin], async (req, res) => {
     }
 
     await Review.deleteMany({ productId: req.params.id });
-    
     await product.deleteOne();
     res.json({ message: 'Product and its reviews deleted successfully' });
   } catch (error) {

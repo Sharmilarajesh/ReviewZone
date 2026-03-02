@@ -6,12 +6,14 @@ const fs = require('fs');
 const createFolders = () => {
   const dirs = [
     'uploads/products',
-    'uploads/reviews'
+    'uploads/reviews',
+    'uploads/products/seeds'
   ];
   
   dirs.forEach(dir => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
+      console.log(`📁 Created folder: ${dir}`);
     }
   });
 };
@@ -37,6 +39,7 @@ const reviewStorage = multer.diskStorage({
   }
 });
 
+// File filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());

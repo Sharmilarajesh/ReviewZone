@@ -1,28 +1,33 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/api';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "../services/api";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const editId = queryParams.get('edit');
+  const editId = queryParams.get("edit");
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    description: ''
+    name: "",
+    price: "",
+    description: "",
   });
   const [image, setImage] = useState(null);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -30,7 +35,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (editId && products.length > 0) {
-      const product = products.find(p => p._id === editId);
+      const product = products.find((p) => p._id === editId);
       if (product) {
         handleEditProduct(product);
       }
@@ -42,7 +47,7 @@ const AdminDashboard = () => {
       const { data } = await getProducts();
       setProducts(data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
@@ -57,70 +62,75 @@ const AdminDashboard = () => {
     setFormData({
       name: product.name,
       price: product.price,
-      description: product.description
+      description: product.description,
     });
     setShowForm(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancelForm = () => {
     setEditingProduct(null);
-    setFormData({ name: '', price: '', description: '' });
+    setFormData({ name: "", price: "", description: "" });
     setImage(null);
     setShowForm(false);
-    setError('');
-    navigate('/admin');
+    setError("");
+    navigate("/admin");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     const formDataToSend = new FormData();
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('description', formData.description);
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("description", formData.description);
     if (image) {
-      formDataToSend.append('image', image);
+      formDataToSend.append("image", image);
     }
 
     try {
       if (editingProduct) {
         await updateProduct(editingProduct._id, formDataToSend);
-        setSuccess('Product updated successfully!');
+        setSuccess("Product updated successfully!");
       } else {
         await addProduct(formDataToSend);
-        setSuccess('Product added successfully!');
+        setSuccess("Product added successfully!");
       }
-      
+
       setEditingProduct(null);
-      setFormData({ name: '', price: '', description: '' });
+      setFormData({ name: "", price: "", description: "" });
       setImage(null);
       setShowForm(false);
-      
+
       fetchProducts();
-      navigate('/admin');
+      navigate("/admin");
     } catch (error) {
-      setError(error.response?.data?.message || 'Something went wrong');
+      setError(error.response?.data?.message || "Something went wrong");
     }
   };
 
   const handleDeleteProduct = async (productId) => {
-    if (!window.confirm('Are you sure you want to delete this product? All reviews will also be deleted.')) return;
-    
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this product? All reviews will also be deleted.",
+      )
+    )
+      return;
+
     try {
       await deleteProduct(productId);
-      setSuccess('Product deleted successfully!');
+      setSuccess("Product deleted successfully!");
       fetchProducts();
     } catch (error) {
-      setError('Failed to delete product');
+      setError("Failed to delete product");
     }
   };
 
   // Helper function to get image URL
   const getImageUrl = (path) => {
-    if (!path) return 'https://via.placeholder.com/50x50?text=No+Img';
+    if (!path) return "https://via.placeholder.com/50x50?text=No+Img";
     return `http://localhost:5000${path}`;
   };
 
@@ -147,18 +157,16 @@ const AdminDashboard = () => {
         </div>
       )}
       {success && (
-        <div className="text-green-600 p-3 rounded-lg mb-4">
-          {success}
-        </div>
+        <div className="text-green-600 p-3 rounded-lg mb-4">{success}</div>
       )}
 
       {/* Add/Edit Product Form */}
       {showForm && (
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
-            {editingProduct ? 'Edit Product' : 'Add New Product'}
+            {editingProduct ? "Edit Product" : "Add New Product"}
           </h2>
-          
+
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -209,13 +217,14 @@ const AdminDashboard = () => {
               {editingProduct?.image && !image && (
                 <div className="mt-2 flex items-center gap-2">
                   <p className="text-sm text-gray-500">Current image:</p>
-                  <img 
-                    src={getImageUrl(editingProduct.image)} 
+                  <img
+                    src={getImageUrl(editingProduct.image)}
                     alt="Current"
                     className="h-10 w-10 object-cover rounded"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/40x40?text=Error';
+                      e.target.src =
+                        "https://via.placeholder.com/40x40?text=Error";
                     }}
                   />
                 </div>
@@ -227,7 +236,7 @@ const AdminDashboard = () => {
                 type="submit"
                 className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-6 py-2 rounded-lg"
               >
-                {editingProduct ? 'Update Product' : 'Add Product'}
+                {editingProduct ? "Update Product" : "Add Product"}
               </button>
               <button
                 type="button"
@@ -244,7 +253,7 @@ const AdminDashboard = () => {
       {/* Products List */}
       <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">All Products</h2>
-        
+
         {products.length === 0 ? (
           <p className="text-gray-600 text-center py-8">No products found</p>
         ) : (
@@ -261,27 +270,26 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.map(product => (
-                  <tr key={product._id} className="border-b border-[#e0e0e0] hover:bg-gray-50">
+                {products.map((product) => (
+                  <tr
+                    key={product._id}
+                    className="border-b border-[#e0e0e0] hover:bg-gray-50"
+                  >
                     <td className="py-3 px-2">
                       <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                        <img 
-                          src={getImageUrl(product.image)}
+                        <img
+                          src={
+                            product.image ||
+                            "https://via.placeholder.com/50x50?text=No+Img"
+                          }
                           alt={product.name}
                           className="max-w-full max-h-full object-contain"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/50x50?text=No+Img';
+                            e.target.src =
+                              "https://via.placeholder.com/50x50?text=No+Img";
                           }}
                         />
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 font-medium">{product.name}</td>
-                    <td className="py-3 px-2">₹{product.price}</td>
-                    <td className="py-3 px-2">
-                      <div className="flex items-center">
-                        <span className="text-yellow-400 mr-1">★</span>
-                        {product.avgRating?.toFixed(1) || 0}
                       </div>
                     </td>
                     <td className="py-3 px-2">{product.totalReviews || 0}</td>
@@ -324,10 +332,12 @@ const AdminDashboard = () => {
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-6">
           <h3 className="text-gray-600 mb-2">Average Rating</h3>
           <p className="text-3xl font-bold text-[#8B5CF6]">
-            {products.length > 0 
-              ? (products.reduce((sum, p) => sum + (p.avgRating || 0), 0) / products.length).toFixed(1)
-              : 0
-            }
+            {products.length > 0
+              ? (
+                  products.reduce((sum, p) => sum + (p.avgRating || 0), 0) /
+                  products.length
+                ).toFixed(1)
+              : 0}
           </p>
         </div>
       </div>

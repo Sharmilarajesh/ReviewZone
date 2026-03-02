@@ -1,15 +1,11 @@
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
-  const imageUrl = product.image 
-    ? `http://localhost:5000${product.image}` 
-    : 'https://via.placeholder.com/300x300?text=No+Image';
-
   return (
     <div className="bg-white border border-[#e0e0e0] rounded-lg p-6 hover:shadow-lg transition-shadow">
       <div className="h-40 mb-4 flex items-center justify-center bg-gray-50 rounded">
         <img 
-          src={imageUrl}
+          src={product.image || 'https://via.placeholder.com/300x300?text=No+Image'}
           alt={product.name}
           className="max-h-full max-w-full object-contain"
           onError={(e) => {

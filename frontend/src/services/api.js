@@ -1,10 +1,14 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const baseURL = 'https://reviewzone-backend.onrender.com/api';
 
+console.log('API Base URL:', baseURL); 
 
 const API = axios.create({
-  baseURL: baseURL
+  baseURL: baseURL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 API.interceptors.request.use((req) => {
@@ -12,6 +16,7 @@ API.interceptors.request.use((req) => {
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;
   }
+  console.log('API Request:', req.method, req.url); // Debug
   return req;
 });
 
@@ -36,7 +41,7 @@ export const addReview = (formData) => API.post('/reviews', formData, {
 });
 export const updateReview = (id, formData) => API.put(`/reviews/${id}`, formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
-}); 
+});
 export const deleteReview = (id) => API.delete(`/reviews/${id}`);
 export const getMyReviews = () => API.get('/reviews/my-reviews');
 
