@@ -6,8 +6,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "create-admin": "node createAdmin.js",
- 
-    "postinstall": "cd ../frontend && npm install && npm run build"
+    "postinstall": "cd ../frontend && npm install --include=dev && npm run build"
   },
   "keywords": [],
   "author": "",
